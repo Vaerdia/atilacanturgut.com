@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https:; frame-src https://www.youtube-nocookie.com https://www.youtube.com; connect-src 'none'; font-src 'self';">
+    <title>Atila Can Turgut | Game Developer</title>
+    <style>
+        /* CSS: Clean, minimalist, and responsive styling */
+        :root {
+            --bg-color: #f9f9f9;
+            --text-color: #222;
+            --accent-color: #555;
+            --status-shipped: #2e7d32;
+            --status-demo: #1565c0;
+            --status-dev: #e65100;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px 30px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-weight: 400;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-top: 5px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Homepage Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 40px 0;
+        }
+
+        .card {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .thumbnail-placeholder {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-weight: bold;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .shipped { background-color: var(--status-shipped); }
+        .demo { background-color: var(--status-demo); }
+        .development { background-color: var(--status-dev); }
+
+        .card h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.4rem;
+        }
+
+        .card p {
+            margin: 0;
+            color: var(--accent-color);
+            font-size: 0.95rem;
+        }
+
+        /* Detailed Game View */
+        #game-view {
+            display: none;
+            padding-bottom: 60px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: underline;
+            margin-bottom: 30px;
+        }
+
+        .trailer-link {
+            color: var(--text-color);
+            text-decoration: none;
+            border-bottom: 2px solid var(--accent-color);
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .trailer-link:hover {
+            color: var(--status-demo);
+            border-color: var(--status-demo);
+        }
+
+        .steam-link {
+            color: var(--text-color);
+            text-decoration: none;
+            border-bottom: 2px solid var(--accent-color);
+            transition: color 0.2s, border-color 0.2s;
+            margin-left: 20px;
+        }
+
+        .steam-link:hover {
+            color: #1a9fff;
+            border-color: #1a9fff;
+        }
+
+        .thumbnail-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .screenshot-row {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .screenshot-btn {
+            flex: 1;
+            height: 220px;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            position: relative;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .screenshot-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            z-index: 1;
+        }
+
+        .screenshot-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 600px) {
+            .screenshot-row {
+                flex-direction: column;
+            }
+            .screenshot-btn {
+                height: 180px;
+            }
+        }
+
+        /* Lightbox */
+        #lightbox-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        #lightbox-overlay.active {
+            display: flex;
+        }
+
+        #lightbox-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 4px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            cursor: default;
+        }
+
+        #lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            line-height: 1;
+            z-index: 1001;
+            transition: color 0.2s;
+        }
+
+        #lightbox-close:hover {
+            color: #ccc;
+        }
+
+        .game-header h2 {
+            color: var(--text-color);
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+        }
+
+        .role-tag {
+            display: inline-block;
+            background: #eee;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            margin-right: 10px;
+        }
+
+        .details-section h3 {
+            margin-top: 30px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .details-section ul {
+            padding-left: 20px;
+        }
+
+        .details-section li {
+            margin-bottom: 10px;
+        }
+
+        /* About Section */
+        #about {
+            border-top: 1px solid #ddd;
+            margin-top: 40px;
+            padding-top: 40px;
+            padding-bottom: 60px;
+        }
+
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .skill-tag {
+            background: #222;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .education-section {
+            margin-top: 35px;
+        }
+        
+        .education-section p {
+            margin: 5px 0 0 0;
+            font-size: 1.05rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header id="main-header">
+        <h1>Atila Can Turgut</h1>
+        <h2>Game Developer & Programmer</h2>
+    </header>
+
+    <div class="container">
+        <!-- HOMEPAGE VIEW -->
+        <main id="home-view">
+            <div class="grid" id="portfolio-grid">
+                <!-- Javascript will inject the game cards here -->
+            </div>
+
+            <section id="about">
+                <h2><strong>About Me</strong></h2>
+                <p>I am a game developer specializing in programming robust systems, developing efficient algorithms, and building scalable mechanics. I focus on state machines, optimized gameplay logic, and resilient C# code architectures to bring complex game designs to life.</p>
+                
+                <h3>Technical Toolkit</h3>
+                <div class="skills-grid">
+                    <span class="skill-tag">C# & Unity</span>
+                    <span class="skill-tag">State Machines</span>
+                    <span class="skill-tag">Programming Algorithms</span>
+                    <span class="skill-tag">System Architecture</span>
+                    <span class="skill-tag">Procedural Mesh Generation</span>
+                    <span class="skill-tag">Particle Systems</span>
+                </div>
+
+                <div class="education-section">
+                    <h3>Education</h3>
+                    <p>Associate Degree in Cyber Security</p>
+                    <p><a href="https://drive.google.com/file/d/1yJMD-MsCbL7AaXUER4wJ0-JvNqWoddtw/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="trailer-link">View Full CV</a></p>
+                </div>
+            </section>
+        </main>
+
+        <!-- DETAILED GAME VIEW -->
+        <main id="game-view">
+            <button class="back-btn" onclick="showHome()">← Back to Projects</button>
+            
+            <div id="game-content">
+                <!-- Javascript will inject specific game details here -->
+            </div>
+        </main>
+    </div>
+
+    <div id="lightbox-overlay" onclick="closeLightbox(event)">
+        <button id="lightbox-close" onclick="closeLightbox(event)">&times;</button>
+        <img id="lightbox-img" src="" alt="Screenshot">
+    </div>
+
+    <script>
+        /* JAVASCRIPT: Data and Navigation Logic */
+
+        const gamesData = {
+            "cybercook": {
+                title: "Cybercook",
+                role: "Programmer",
+                status: "Shipped Title",
+                statusClass: "shipped",
+                tagline: "Programmed core loops, dynamic mesh cutting, and rich particle systems for this fully shipped title.",
+                thumbnail: "CyberCook/CyberCook_Thumbnail.jpg",
+                trailerUrl: "https://youtu.be/I2HOOSiJrhM?si=TIbzRcCyi1hpFdwh",
+                steamUrl: "https://store.steampowered.com/app/3366140/CyberCook/",
+                screenshots: ["CyberCook/ss1.png", "CyberCook/ss2.png"],
+                contributions: [
+                    "Developed procedural mesh-cutting algorithms allowing players to dynamically slice objects at runtime.",
+                    "Engineered and optimized rich particle systems to enhance the visual feedback of the core loops.",
+                    "Structured scalable state machines to manage game flow in a fully deployed environment."
+                ],
+                deepDive: "The most significant technical challenge was implementing the mesh-cutting mechanic. It required writing precise algorithms to dynamically generate new vertices and triangles at runtime, calculating cross-sections instantly without causing framerate drops or physics engine glitches."
+            },
+            "till-death": {
+                title: "Till Death Rolls Us Apart",
+                role: "Programmer",
+                status: "Playable Demo",
+                statusClass: "demo",
+                tagline: "Engineered a highly modular dice-mechanic architecture for a fully playable feature demo.",
+                thumbnail: "TillDeathRollsUsApart/TillDeathRollsUsApart_Thumbnail.jpg",
+                trailerUrl: "https://youtu.be/JBeaE64ROK4?si=S-R-NCIp0699reRq",
+                steamUrl: "https://store.steampowered.com/app/3707150/till_death_ROLLS_us_apart/",
+                screenshots: ["TillDeathRollsUsApart/ss1.jpg", "TillDeathRollsUsApart/ss2.jpg"],
+                contributions: [
+                    "Designed and implemented robust C# code architecture to support a massive variety of modular dice mechanics.",
+                    "Structured scalable state machines to handle turn-based battle logic seamlessly.",
+                    "Programmed a highly polished playable demo that fully demonstrates core combat loops and mechanic synergies."
+                ],
+                deepDive: "The core of the architecture revolves around managing an extensive variety of dice mechanics. I programmed systems to handle base rolling, dynamic face-alteration algorithms, probability manipulation, and compounding dice interactions, ensuring all of these disparate mechanics synced perfectly with the combat state machine and UI."
+            },
+            "silent-fangs": {
+                title: "Silent Fangs Stealthy Vampire's Tale",
+                role: "Gameplay Programmer",
+                status: "In Development",
+                statusClass: "development",
+                tagline: "Built fluid parkour systems, bite mechanics, and dynamic particle effects.",
+                thumbnail: "SilentFangs/SilentFangs_Thumbnail.jpg",
+                trailerUrl: "https://youtu.be/Ln6Hk7w9oV0?si=27ROGawpSMwDduys",
+                steamUrl: "https://store.steampowered.com/app/3668110/Silent_Fangs_Stealthy_Vampires_Tale/",
+                screenshots: ["SilentFangs/ss1.jpg", "SilentFangs/ss2.jpg"],
+                contributions: [
+                    "Programmed robust parkour algorithms, allowing seamless transitioning between running, vaulting, and environmental traversal.",
+                    "Implemented the core vampire bite mechanic and its associated state and animation transitions.",
+                    "Developed vibrant, optimized particle effects for blood splatters and environmental hazards like lava.",
+                    "Built foundational enemy AI to react naturally to player movement and actions within the environment."
+                ],
+                deepDive: "To make traversal feel responsive, I developed a parkour system utilizing raycasting and state machines. This ensures the player character constantly reads environmental geometry, smoothly transitioning into climbing or vaulting states based on velocity and angle of approach."
+            },
+            "way-of-madness": {
+                title: "Way of Madness",
+                role: "Systems Programmer",
+                status: "In Development",
+                statusClass: "development",
+                tagline: "Developed a dynamic inventory, crafting architecture, and branching dialogue systems.",
+                thumbnail: "WayOfMadness/WayOfMadness_Thumbnail.jpg",
+                trailerUrl: "https://youtu.be/XFPDPof2k7A?si=m52f56p_9UcAmXVF",
+                steamUrl: "https://store.steampowered.com/app/3866230/Way_of_Madness/",
+                screenshots: ["WayOfMadness/ss1.jpg", "WayOfMadness/ss2.jpg"],
+                contributions: [
+                    "Architected a flexible inventory system that fully supports a streamlined crafting mechanic.",
+                    "Programmed a robust dialogue system capable of handling branching conversations and triggering gameplay events.",
+                    "Built resilient core systems and state machines for long-term project scalability."
+                ],
+                deepDive: "The dialogue system was built as a heavily data-driven framework. By separating the dialogue text and branching logic from the core game code, it allows for rapid iteration and complex conversation trees that can directly hook into and alter the game's overarching state machine."
+            }
+        };
+
+        function initGrid() {
+            const grid = document.getElementById('portfolio-grid');
+            
+            for (const [id, game] of Object.entries(gamesData)) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => showGame(id);
+                
+                card.innerHTML = `
+                    <div class="thumbnail-placeholder">
+                        <span class="status-badge ${game.statusClass}">${game.status}</span>
+                        <img src="${game.thumbnail}" alt="${game.title} Thumbnail">
+                    </div>
+                    <h3>${game.title}</h3>
+                    <p>${game.tagline}</p>
+                `;
+                grid.appendChild(card);
+            }
+        }
+
+        function showGame(gameId) {
+            const game = gamesData[gameId];
+            const content = document.getElementById('game-content');
+            
+            const listItems = game.contributions.map(item => `<li>${item}</li>`).join('');
+
+            content.innerHTML = `
+                <div class="game-header">
+                    <h2>${game.title}</h2>
+                    <span class="role-tag">${game.role}</span>
+                    <span class="role-tag" style="background-color: var(--status-${game.statusClass}); color: white;">${game.status}</span>
+                </div>
+                
+                <div class="details-section">
+                    <h3>My Contributions</h3>
+                    <ul>
+                        ${listItems}
+                    </ul>
+                </div>
+
+                <div class="details-section">
+                    <h3>Technical Deep Dive</h3>
+                    <p>${game.deepDive}</p>
+                </div>
+                
+                <div class="screenshot-row">
+                    <div class="screenshot-btn" onclick="openLightbox('${game.screenshots[0]}')"><img src="${game.screenshots[0]}" alt="${game.title} Screenshot 1"></div>
+                    <div class="screenshot-btn" onclick="openLightbox('${game.screenshots[1]}')"><img src="${game.screenshots[1]}" alt="${game.title} Screenshot 2"></div>
+                </div>
+
+                <div class="details-section" style="margin-top: 30px;">
+                    <h3>
+                        <a href="${game.trailerUrl}" target="_blank" rel="noopener noreferrer" class="trailer-link">Trailer</a>
+                        <a href="${game.steamUrl}" target="_blank" rel="noopener noreferrer" class="steam-link">Steam Page</a>
+                    </h3>
+                </div>
+            `;
+
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('main-header').style.display = 'none';
+            document.getElementById('game-view').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        function showHome() {
+            document.getElementById('game-view').style.display = 'none';
+            document.getElementById('home-view').style.display = 'block';
+            document.getElementById('main-header').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        function openLightbox(src) {
+            const overlay = document.getElementById('lightbox-overlay');
+            const img = document.getElementById('lightbox-img');
+            img.src = src;
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox(e) {
+            if (e.target === document.getElementById('lightbox-overlay') || e.target === document.getElementById('lightbox-close')) {
+                document.getElementById('lightbox-overlay').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('lightbox-overlay').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        window.onload = initGrid;
+    </script>
+</body>
+</html>
